@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = "http://localhost:3000/";
+axios.defaults.baseURL = "https://projeto-20-memories-backend.vercel.app/";
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 

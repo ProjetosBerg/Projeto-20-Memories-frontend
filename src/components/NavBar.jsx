@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
-import "../../src/components/Navbar.css";
+
 import useSearch from "../Hooks/useSearch";
+
+import "../components/NavBar.css";
 
 const Navbar = () => {
   const { searchQuery, setSearchQuery } = useSearch()

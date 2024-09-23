@@ -26,4 +26,17 @@
   }
   
   
-  
+   .add{
+    background-color: #1c99d3;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    padding: 0 1rem; ;
+    cursor: pointer;
+    transition: 0.4s;
+  }
+
+  .add:hover {
+    background-color: #1c99d3;
+    border: 1px solid #1146a6;
+    color: #1146a6;
+  }

@@ -28,7 +28,7 @@ const Navbar = () => {
         <li>
           <Link to="/">Home</Link>
         </li>
-        <li>
+        <li className="add">
           <Link to="/add-memory">Adicionar Memória</Link>
         </li>
       </ul>

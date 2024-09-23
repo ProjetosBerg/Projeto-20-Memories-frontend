@@ -11,15 +11,26 @@ import "./AddMemory.css";
 const AddMemory = () => {
   const [inputs, setInputs] = useState({});
   const [image, setImage] = useState(null);
-
+  const [imageUrl, setImageUrl] = useState("");
 
   const navigate = useNavigate();
+
+  const isValidImageUrl = (url) => {
+    return /\.(jpg|jpeg|png|gif)$/.test(url.toLowerCase());
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (!isValidImageUrl(inputs.imageUrl)) {
+      toast.error(
+        "URL da imagem inválida. Certifique-se de que a URL termina com .jpg, .jpeg, .png ou .gif."
+      );
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("image", image);
+    formData.append("imageUrl", inputs.imageUrl);
     formData.append("title", inputs.title);
     formData.append("description", inputs.description);
 
@@ -43,6 +54,12 @@ const AddMemory = () => {
       setImage(event.target.files[0]);
     } else {
       setInputs({ ...inputs, [event.target.name]: event.target.value });
+    }
+
+    if (event.target.name === "imageUrl" && isValidImageUrl(event.target.value)) {
+      setImageUrl(event.target.value);
+    } else {
+      setImageUrl("");
     }
   };
 
@@ -69,9 +86,21 @@ const AddMemory = () => {
           />
         </label>
         <label>
-          <p>Foto:</p>
-          <input type="file" name="image" onChange={handleChange} />
+          <div className="image-control">
+            <p>Url da Foto:</p>
+            <div className="input-image-wrapper">
+              <textarea type="text" name="imageUrl" onChange={handleChange} />
+              {imageUrl && <img src={imageUrl} alt="imagem selecionada"  />}
+              {!imageUrl && (
+                <img
+                  src={`https://img.freepik.com/vetores-premium/nenhuma-foto-disponivel-icone-vetorial-simbolo-de-imagem-padrao-imagem-em-breve-para-site-ou-aplicativo-movel_87543-10639.jpg`}
+                  alt="imagem padrão"
+                />
+              )}
+            </div>
+          </div>
         </label>
+
         <input className="btn" type="submit" value="Enviar" />
       </form>
     </div>

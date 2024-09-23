@@ -56,7 +56,6 @@ const Home = () => {
     }
     return b.favorite ? 1 : -1; 
   });
-  
 
   return (
     <div className="home">
@@ -68,7 +67,7 @@ const Home = () => {
             <div className="memory" key={memory._id}>
               <div className="image-container">
                 <img
-                  src={`${axios.defaults.baseURL}${memory.src}`}
+                  src={memory.imageUrl || `${axios.defaults.baseURL}${memory.src}`}
                   alt={memory.title}
                 />
                 <button

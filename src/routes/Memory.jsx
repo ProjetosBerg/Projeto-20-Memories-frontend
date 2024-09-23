@@ -1,6 +1,6 @@
 import axios from "../axios-config";
 import { useState, useEffect } from "react";
-import {  useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./Memory.css";
 
@@ -8,6 +8,7 @@ const Memory = () => {
   const { id } = useParams();
   const [memory, setMemory] = useState(null);
   const [comments, setComments] = useState([]);
+  const [imageUrl, setImageUrl] = useState("");
   const [name, setName] = useState("");
   const [text, setText] = useState("");
 
@@ -25,7 +26,8 @@ const Memory = () => {
       setComments(res.data.comments);
       setEditTitle(res.data.title);
       setEditDescription(res.data.description);
-      setEditImage(res.data.src);
+      setEditImage(res.data.imageUrl);
+      setImageUrl(res.data.imageUrl);
     };
 
     getMemory();
@@ -35,7 +37,10 @@ const Memory = () => {
     e.preventDefault();
     try {
       const comment = { name, text };
-      const res = await axios.patch(`/memories/${memory._id}/comment/`, comment);
+      const res = await axios.patch(
+        `/memories/${memory._id}/comment/`,
+        comment
+      );
       const lastComment = res.data.memory.comments.pop();
       setComments((comments) => [...comments, lastComment]);
       setName("");
@@ -47,14 +52,34 @@ const Memory = () => {
     }
   };
 
+  const isValidImageUrl = (url) => {
+    return /\.(jpg|jpeg|png|gif)$/.test(url.toLowerCase());
+  };
+
+  const handleImageChange = (e) => {
+    const newImageUrl = e.target.value;
+    setEditImage(newImageUrl);
+  
+    if (isValidImageUrl(newImageUrl)) {
+      setImageUrl(newImageUrl); 
+    } else {
+      setImageUrl("");
+    }
+  };
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
-    formData.append("image", editImage); 
-    formData.append("title", editTitle); 
-    formData.append("description", editDescription); 
-  
+    formData.append("imageUrl", editImage);
+    formData.append("title", editTitle);
+    formData.append("description", editDescription);
+
+    if (editImage && !isValidImageUrl(editImage)) {
+      toast.error("URL da imagem inválida. Certifique-se de que a URL termina com .jpg, .jpeg, .png ou .gif.");
+      return;
+    }
+
     try {
       const response = await axios.patch(`/memories/${memory._id}`, formData, {
         headers: {
@@ -65,24 +90,24 @@ const Memory = () => {
       setIsEditing(false);
       navigate(`/`);
       toast.success("Memória atualizada com sucesso!");
-
     } catch (error) {
       console.log(error);
       toast.error("Erro ao atualizar a memória.");
     }
   };
-  
 
   if (!memory) return <p>Carregando...</p>;
 
   return (
     <div className="memory-page">
-      <img src={`${axios.defaults.baseURL}${memory.src}`} alt={memory.title} />
+      <img
+        src={memory.imageUrl || `${axios.defaults.baseURL}${memory.src}`}
+        alt={memory.title}
+      />
       <h2>{memory.title}</h2>
       <p>{memory.description}</p>
 
-      {/* Botão para editar */}
-      <button  className ="btn" onClick={() => setIsEditing((prev) => !prev)}>
+      <button className="btn" onClick={() => setIsEditing((prev) => !prev)}>
         {isEditing ? "Cancelar Edição" : "Editar"}
       </button>
 
@@ -107,13 +132,20 @@ const Memory = () => {
               />
             </label>
             <label>
-              Imagem:
-              <input
-                type="file"
-                name="image"
-                onChange={(e) => setEditImage(e.target.files[0])}
-              />
-            </label>
+          <div className="image-control">
+            <p>Url da Foto:</p>
+            <div className="input-image-wrapper">
+              <textarea type="text" name="imageUrl" onChange={(e) => handleImageChange(e)} value={editImage || ''} />
+              {imageUrl && <img src={imageUrl} alt="imagem selecionada"  />}
+              {!imageUrl && (
+                <img
+                  src={`https://img.freepik.com/vetores-premium/nenhuma-foto-disponivel-icone-vetorial-simbolo-de-imagem-padrao-imagem-em-breve-para-site-ou-aplicativo-movel_87543-10639.jpg`}
+                  alt="imagem padrão"
+                />
+              )}
+            </div>
+          </div>
+        </label>
             <input className="btn" type="submit" value="Atualizar" />
           </form>
         </div>
